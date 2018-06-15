@@ -1,3 +1,4 @@
+let fs = require("fs");
 let News = require("./news.js");
 let User = require("./user.js")
 let EventEmitter = require("./event_emitter.js");
@@ -18,7 +19,7 @@ class AllNewsUsers {
     get allUsers() {
         return this._allUsers;
     }
-    get eventEmitter(){
+    get eventEmitter() {
         return this._eventEmitter;
     }
 
@@ -26,8 +27,6 @@ class AllNewsUsers {
         let flagTitleNews = false;
         this._allNews.some(oneNews => {
             if (oneNews.title == titleNews) {
-                console.log("Id news in create news " + oneNews.id);
-                
                 let article = oneNews.addArticle();
                 article.newsId = oneNews.id;
                 this._eventEmitter.publish(oneNews.title, article);
@@ -38,7 +37,6 @@ class AllNewsUsers {
         if (flagTitleNews == false) {
             let idTitleNews = this._allNews.length;
             let oneNews = new News(idTitleNews, titleNews);
-            console.log("Id news in create news " + oneNews.id);
             let article = oneNews.addArticle();
             article.newsId = oneNews.id;
             this._allNews.push(oneNews);
@@ -59,26 +57,51 @@ class AllNewsUsers {
         return user;
     }
 
-    // subscribeUser(titleNews, idUser) {
-    //     let res = "";
-    //     if (this._allUsers[idUser]) {
-    //         res = this._allUsers[idUser];
-    //         this._eventEmitter.subscribe(titleNews, res.getNews)
-            
-    //         const user = this._allNews.find(oneNews => {
-    //             if(oneNews.title === titleNews){
-    //                 // let idNews = oneNews.id;
-    //                 // let subscription = { idNews, titleNews };
-    //                 // this._allUsers[idUser].subscriptions.push(subscription)
-    //                 return true
-    //             }
-    //             return false;
-    //         })
-    //     } else {
-    //         res = `Not found User with id ${idUser}`
-    //     }
-    //     return res;
-    // }
+    subscribeUser(newsIdPar, idUser) {
+        let res = "";
+        if (this._allUsers[idUser]) {
+            const news = this._allNews.find(el => { if (el.id === newsIdPar) { return true; } })
+            if (news !== undefined) {
+                res = this._allUsers[idUser];
+                this._eventEmitter.subscribe(news.title, res.getNews)
+                let newsId = news.id;
+                let titleNews = news.title;
+                let subscription = { newsId, titleNews }
+                this._allUsers[idUser].subscriptions.push(subscription)
+            } else {
+                res = `There is not news with id ${newsIdPar}`
+                console.log(res);
+            }
+        } else {
+            res = `Not found User with id ${idUser}`
+            console.log(res);
+        }
+        return res;
+    }
+
+    unsubscribeUser(newsIdPar, idUser) {
+        let res = "";
+        if (this._allUsers[idUser]) {
+
+            res = this._allUsers[idUser];
+            const news = this._allNews.find(el => { if (el.id === newsIdPar) { return true; } })
+            this._eventEmitter.unsubscribe(news.title, res.getNews)
+            const a = this._allUsers[idUser].subscriptions.find(el => {
+                if (el.newsId === news.id) {
+                    return true;
+                }
+            })
+
+            let indexSub = this._allUsers[idUser].subscriptions.indexOf(a);
+            if (indexSub >= 0) {
+                this._allUsers[idUser].subscriptions.splice(indexSub, 1);
+            }
+        } else {
+            res = `Not found User with id ${idUser}`
+            console.log(res);
+        }
+        return res;
+    }
 
     getUser(idUser) {
         let res = "";
@@ -96,13 +119,22 @@ class AllNewsUsers {
         return user.subscriptions;
     }
 
-    // exportUser(idUser){
-    //     let user = this.getUser(idUser);
+    exportUser(idUser) {
+        let user = this.getUser(idUser);
+        let json = JSON.stringify(user,"",2);
+        let time = new Date()
+        fs.writeFile(`user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`, json, 'utf8', (err) => {
+            if (err) {
+                throw err;
+            } else {
+                console.log("The data of form was append to json file");
+            }
+        });
 
-    // }
-    
+    }
 
-    getNews(idNews){
+
+    getNews(idNews) {
         let res = "";
         if (this._allNews[idNews]) {
             res = this._allNews[idNews];
@@ -113,7 +145,7 @@ class AllNewsUsers {
 
     }
 
-    
+
 
 
 }

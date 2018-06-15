@@ -12,92 +12,33 @@ let allNU = new AllNewsUsers(ee);
 
 let alex  = allNU.createUser("alex");
 let den  = allNU.createUser("den");
-let sam  = allNU.createUser("sem");
+let sam  = allNU.createUser("sam");
 
 
-allNU.subscribeUser("sport", alex.id);
-ee.subscribe("it", den.getNews);
-ee.subscribe("fishin", sam.getNews);
-//allNU.subscribeUser("fishin", alex.id);
+allNU.createNews("sport"); //0
+allNU.createNews("it");    //1
+allNU.createNews("fishin");//2
 
+allNU.subscribeUser(0, alex.id);
+allNU.subscribeUser(2, alex.id);
+allNU.subscribeUser(1, den.id);
+allNU.subscribeUser(2, sam.id);
+allNU.subscribeUser(1, sam.id);
 
-allNU.createNews("sport");
-allNU.createNews("sport");
-allNU.createNews("it");
-allNU.createNews("garden");
-//ee.unsubscribe("sport", alex.getNews);
 allNU.createNews("sport");
 allNU.createNews("fishin");
+allNU.createNews("it");
 
-console.log("All articte of alex - " + alex.articles);
-console.log("All articte of den - " + den.articles);
-console.log("All articte of sam - " + sam.articles);
+allNU.unsubscribeUser(2, alex.id);
+allNU.unsubscribeUser(1, sam.id);
 
+allNU.createNews("sport");
+allNU.createNews("it");
 
-
-//console.log(alex.subscriptions);
-//console.log(ee.subscribers);
-
-console.log(allNU.getUser(2));
+console.log(allNU.getUser(alex.id));
+console.log(allNU.getSubsriptions(alex.id));
 console.log(allNU.getNews(0));
-//console.log(allNU.getSubsriptions(alex.id));
 
-//console.log(alex.subscriptions);
-
-
-
-
-
-
-//console.log(allNU.allNews);
-
-
-
-
-
-
-
-
-// let alex = new User(0, "alex");
-// let den = new User(1, "den");
-// let sam = new User(2, "sam");
-
-// let ee = new EventEmitter();
-
-// let allNews = new AllNew(ee)
-// ee.subscribe("sport", alex.getNews);
-// ee.subscribe("sport", den.getNews);
-// ee.subscribe("it", sam.getNews);
-// ee.subscribe("sport", sam.getNews);
-// ee.subscribe("fishin", alex.getNews);
-
-// allNews.createNews("sport");
-// allNews.createNews("it");
-// allNews.createNews("fishin");
-
-// ee.unsubscribe("it", sam.getNews);
-
-// allNews.createNews("sad");
-// allNews.createNews("fishin");
-// allNews.createNews("sport");
-
-// allNews.createNews("it");
-
-
-// console.log("---------");
-
-// console.log("All News" + allNews);
-
-// console.log("---------");
-
-// console.log("All articte of alex - " + alex.articles);
-// console.log("All articte of den - " + den.articles);
-// console.log("All articte of sam - " + sam.articles);
-
-// console.log(alex.articles.forEach(article =>{
-//     console.log(article);
-    
-// }));
 
 
 
