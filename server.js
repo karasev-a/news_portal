@@ -43,23 +43,21 @@ http.createServer((request, response) => {
     console.log(request.method);
     let newsId = 0;
     let userId = 0;
-    let stringArr = request.url.split("/").splice(0, 1);
-    console.log(stringArr);
-    
     let reqUrl = request.url;
 
-    if(stringArr[0]=="news"){
-        if(stringArr.length == 4){
+    let stringArr = request.url.split("/");
+    stringArr.splice(0, 1);
+
+    if (stringArr[0] == "news") {
+        if (stringArr.length == 4) {
             newsId = Number(stringArr[1]);
             userId = Number(stringArr[3]);
-        } else if(stringArr.length == 2){
+        } else if (stringArr.length == 2) {
             newsId = Number(stringArr[1]);
         }
-    }else if(stringArr[0]=="user"){
+    } else if (stringArr[0] == "user") {
         userId = Number(stringArr[1]);
     }
-
-    response.write("<html><body><div>");
 
     switch (reqUrl) {
         case `/news/${newsId}/subscribe/${userId}`:
@@ -80,19 +78,20 @@ http.createServer((request, response) => {
         case `/user/${userId}/export`:
             {
                 allNU.exportUser(userId);
-                response.write(`Data of user ${userId} write to file`);
+                response.writeHead(200, { "Content-Type": "application/json" })
             }
             break;
         case `/user/${userId}`:
-            response.write(JSON.stringify(allNU.getUser(userId), "", 2));
+            {
+                response.write(JSON.stringify(allNU.getUser(userId), "", 2));
+            }
+
             break;
         case `/news/${newsId}`:
             response.write(JSON.stringify(allNU.getNews(newsId), "", 2));
             break;
-        default:
-            {
-                response.write("</div></body></html>");
-            }
     }
     response.end();
 }).listen(3000, () => console.log("Server is working"));
+
+

@@ -1,6 +1,7 @@
 let fs = require("fs");
 let News = require("./News.js");
-let User = require("./User.js")
+let User = require("./User.js");
+let http = require("http");
 
 class AllNewsUsers {
     constructor(eventEmitter) {
@@ -118,16 +119,16 @@ class AllNewsUsers {
 
     exportUser(idUser) {
         let user = this.getUser(idUser);
-        let json = JSON.stringify(user,"",2);
-        let time = new Date()
-        fs.writeFile(`user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`, json, 'utf8', (err) => {
+        let json = JSON.stringify(user, "", 2);
+        let time = new Date();
+        
+        let file = fs.writeFile(`user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`, json, 'utf8', (err) => {
             if (err) {
                 throw err;
             } else {
                 console.log("The data of form was append to json file");
             }
         });
-
     }
 
 
