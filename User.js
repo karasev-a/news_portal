@@ -4,7 +4,7 @@ class User {
         this._name = name;
         this.getNews = this.getNews.bind(this);
         this._articles = [];
-        this.subscriptions = [];
+        this._subscriptions = [];
     }
 
     get id(){
@@ -16,13 +16,13 @@ class User {
     get articles(){
         return this._articles;
     }
-    // get subscriptions(){
-    //     return this._subscriptions;
-    // }
+    get subscriptions(){
+        return this._subscriptions;
+    }
     
 
-    getNews(category, news) {
-        console.log(`${category}: ${news.title} ${news.message}  for ${this._name}`);
+    getNews(news) {
+        console.log(`${news.title} ${news.message}  for ${this._name}`);
         let title = news.title;
         let message = news.message;
         let newsId = news.newsId;

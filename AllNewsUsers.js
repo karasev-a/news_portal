@@ -1,9 +1,6 @@
 let fs = require("fs");
-let News = require("./news.js");
-let User = require("./user.js")
-let EventEmitter = require("./event_emitter.js");
-
-let ee = new EventEmitter();
+let News = require("./News.js");
+let User = require("./User.js")
 
 class AllNewsUsers {
     constructor(eventEmitter) {

@@ -1,4 +1,4 @@
-class EventEmitter {
+class MyEventEmitter {
     constructor() {
         this._subscribers = new Object();
     }
@@ -28,9 +28,9 @@ class EventEmitter {
 
     publish(nameSpace, news) {
         if (this._subscribers[nameSpace]) {
-            this._subscribers[nameSpace].forEach(subscriber => subscriber(nameSpace, news));
+            this._subscribers[nameSpace].forEach(subscriber => subscriber(news));
         }
     }
 }
 
-module.exports = EventEmitter;
+module.exports = MyEventEmitter;

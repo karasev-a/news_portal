@@ -1,10 +1,10 @@
 let http = require("http");
 let fs = require("fs");
 const qs = require("querystring");
-let EventEmitter = require("./event_emitter.js");
-let AllNewsUsers = require("./all_news_users.js");
+let MyEventEmitter = require("./MyEventEmitter.js");
+let AllNewsUsers = require("./AllNewsUsers.js");
 
-let ee = new EventEmitter();
+let ee = new MyEventEmitter();
 let allNU = new AllNewsUsers(ee);
 
 let alex = allNU.createUser("alex");
@@ -15,7 +15,6 @@ allNU.createNews("sport"); //0
 allNU.createNews("it");    //1
 allNU.createNews("fishin");//2
 
-//allNU.subscribeUser(0, alex.id);
 allNU.subscribeUser(0, alex.id);
 allNU.subscribeUser(1, den.id);
 allNU.subscribeUser(2, sam.id);
@@ -44,18 +43,20 @@ http.createServer((request, response) => {
     console.log(request.method);
     let newsId = 0;
     let userId = 0;
-    let stringArr = request.url.split("/");
+    let stringArr = request.url.split("/").splice(0, 1);
+    console.log(stringArr);
+    
     let reqUrl = request.url;
 
-    if(stringArr[1]=="news"){
-        if(stringArr.length == 5){
-            newsId = Number(stringArr[2]);
-            userId = Number(stringArr[4]);
-        } else if(stringArr.length == 3){
-            newsId = Number(stringArr[2]);
+    if(stringArr[0]=="news"){
+        if(stringArr.length == 4){
+            newsId = Number(stringArr[1]);
+            userId = Number(stringArr[3]);
+        } else if(stringArr.length == 2){
+            newsId = Number(stringArr[1]);
         }
-    }else if(stringArr[1]=="user"){
-        userId = Number(stringArr[2]);
+    }else if(stringArr[0]=="user"){
+        userId = Number(stringArr[1]);
     }
 
     response.write("<html><body><div>");
@@ -91,7 +92,7 @@ http.createServer((request, response) => {
         default:
             {
                 response.write("</div></body></html>");
-                response.end();
             }
     }
+    response.end();
 }).listen(3000, () => console.log("Server is working"));
