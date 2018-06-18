@@ -11,6 +11,30 @@ class AllNewsUsers {
         this._counterNews = 0;
     }
 
+    readFileProm(path, coding) {
+        return new Promise((res, rej) => {
+            fs.readFile(path, coding, (err, data) => {
+                if (err) {
+                    rej(err);
+                } else {
+                    res(data);
+                }
+            })
+        })
+    }
+
+    writeFileProm(path, data, coding) {
+        return new Promise((res, rej) => {
+            fs.writeFile(path, data, coding, (err, data) => {
+                if (err) {
+                    rej(err);
+                } else {
+                    res(data);
+                }
+            })
+        })
+    }
+
     get allNews() {
         return this._allNews;
     }
@@ -117,17 +141,16 @@ class AllNewsUsers {
         return user.subscriptions;
     }
 
-    exportUser(idUser) {
+    exportUser(idUser, response) {
         let user = this.getUser(idUser);
         let json = JSON.stringify(user, "", 2);
         let time = new Date();
-        
-        fs.writeFile(`user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`, json, 'utf8', (err) => {
-            if (err) {
-                throw err;
-            } else {
-                console.log("The data of form was append to json file");
-            }
+        let path = `user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`;
+
+        //fs.writeFile(, json, 'utf8', (err) => {
+        return this.writeFileProm(path, json, "utf8").
+        then((user)=>{
+           return  this.readFileProm(path, user, "utf8");
         });
     }
 

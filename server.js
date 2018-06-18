@@ -75,28 +75,37 @@ http.createServer((request, response) => {
         case `/news/${newsId}/subscribe/${userId}`:
             allNU.subscribeUser(newsId, userId);
             response.write(`User with id ${userId} subscribes to news with id ${newsId}`);
+            response.end();
             break;
         case `/news/${newsId}/unsubscribe/${userId}`:
             allNU.unsubscribeUser(newsId, userId);
             response.write(`User with id ${userId} unsubscribes from news with id ${newsId}`);
+            response.end();
             break;
         case `/user/${userId}/subscriptions`:
             response.write(JSON.stringify(allNU.getSubsriptions(userId), "", 2));
+            response.end();
             break;
         case `/user/${userId}/export`:
-                allNU.exportUser(userId);
-                response.writeHead(200, { "Content-Type": "application/json" });
+        response.writeHead(200, { "Content-Disposition": "attachment" });
+            allNU.exportUser(userId, response).then((file)=>{
+                response.write(file, "binary");
+                response.end();
+            });
+
             break;
         case `/user/${userId}`:
             result = allNU.getUser(userId);
             validData(result, User, response);
+            response.end();
             break;
         case `/news/${newsId}`:
             result = allNU.getNews(newsId);
             validData(result, News, response);
+            response.end();
             break;
     }
-    response.end();
+    
 }).listen(3000, () => console.log("Server is working"));
 
 
