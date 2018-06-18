@@ -3,6 +3,8 @@ let fs = require("fs");
 const qs = require("querystring");
 let MyEventEmitter = require("./MyEventEmitter.js");
 let AllNewsUsers = require("./AllNewsUsers.js");
+let User = require("./User.js");
+let News = require("./News.js")
 
 let ee = new MyEventEmitter();
 let allNU = new AllNewsUsers(ee);
@@ -34,15 +36,25 @@ console.log(allNU.getUser(alex.id));
 console.log(allNU.getSubsriptions(alex.id));
 console.log(allNU.getNews(0));
 
+let newsId = 0;
+let userId = 0;
+let result = "";
 
+function validData(result, typeOfClass, response) {
+    if (result instanceof typeOfClass) {
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.write(JSON.stringify(result, "", 2));
+    } else {
+        response.writeHead(404, { "Content-Type": "text/plain" });
+        response.write(`404 ${result}`);
+    }
+}
 
 http.createServer((request, response) => {
 
-
     console.log(request.url);
     console.log(request.method);
-    let newsId = 0;
-    let userId = 0;
+
     let reqUrl = request.url;
 
     let stringArr = request.url.split("/");
@@ -61,37 +73,32 @@ http.createServer((request, response) => {
 
     switch (reqUrl) {
         case `/news/${newsId}/subscribe/${userId}`:
-            {
-                allNU.subscribeUser(newsId, userId);
-                response.write(`User with id ${userId} subscribes to news with id ${newsId}`);
-            }
+            allNU.subscribeUser(newsId, userId);
+            response.write(`User with id ${userId} subscribes to news with id ${newsId}`);
             break;
         case `/news/${newsId}/unsubscribe/${userId}`:
-            {
-                allNU.unsubscribeUser(newsId, userId);
-                response.write(`User with id ${userId} unsubscribes from news with id ${newsId}`);
-            }
+            allNU.unsubscribeUser(newsId, userId);
+            response.write(`User with id ${userId} unsubscribes from news with id ${newsId}`);
             break;
         case `/user/${userId}/subscriptions`:
             response.write(JSON.stringify(allNU.getSubsriptions(userId), "", 2));
             break;
         case `/user/${userId}/export`:
-            {
                 allNU.exportUser(userId);
-                response.writeHead(200, { "Content-Type": "application/json" })
-            }
+                response.writeHead(200, { "Content-Type": "application/json" });
             break;
         case `/user/${userId}`:
-            {
-                response.write(JSON.stringify(allNU.getUser(userId), "", 2));
-            }
-
+            result = allNU.getUser(userId);
+            validData(result, User, response);
             break;
         case `/news/${newsId}`:
-            response.write(JSON.stringify(allNU.getNews(newsId), "", 2));
+            result = allNU.getNews(newsId);
+            validData(result, News, response);
             break;
     }
     response.end();
 }).listen(3000, () => console.log("Server is working"));
+
+
 
 

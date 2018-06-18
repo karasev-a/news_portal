@@ -1,0 +1,12 @@
+{
+  "_id": 0,
+  "_name": "alex",
+  "_articles": [
+    {
+      "title": "article # 1 of sport ",
+      "message": "bla bla bla in article # 1",
+      "newsId": 0
+    }
+  ],
+  "_subscriptions": []
+}

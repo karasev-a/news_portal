@@ -122,7 +122,7 @@ class AllNewsUsers {
         let json = JSON.stringify(user, "", 2);
         let time = new Date();
         
-        let file = fs.writeFile(`user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`, json, 'utf8', (err) => {
+        fs.writeFile(`user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`, json, 'utf8', (err) => {
             if (err) {
                 throw err;
             } else {
@@ -140,7 +140,6 @@ class AllNewsUsers {
             res = `Not found News with id ${idNews}`
         }
         return res;
-
     }
 
 
