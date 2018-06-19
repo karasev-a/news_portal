@@ -5,9 +5,11 @@ let MyEventEmitter = require("./MyEventEmitter.js");
 let AllNewsUsers = require("./AllNewsUsers.js");
 let User = require("./User.js");
 let News = require("./News.js")
+let SendResponse = require("./SendResponse.js");
 
 let ee = new MyEventEmitter();
 let allNU = new AllNewsUsers(ee);
+let sendResponse = new SendResponse();
 
 let alex = allNU.createUser("alex");
 let den = allNU.createUser("den");
@@ -26,37 +28,16 @@ allNU.createNews("sport");
 allNU.createNews("fishin");
 allNU.createNews("it");
 
-allNU.unsubscribeUser(0, alex.id);
-allNU.unsubscribeUser(1, sam.id);
-
 allNU.createNews("sport");
 allNU.createNews("it");
-
-console.log(allNU.getUser(alex.id));
-console.log(allNU.getSubsriptions(alex.id));
-console.log(allNU.getNews(0));
 
 let newsId = 0;
 let userId = 0;
 let result = "";
-
-function validData(result, typeOfClass, response) {
-    if (result instanceof typeOfClass) {
-        response.writeHead(200, { "Content-Type": "application/json" });
-        response.write(JSON.stringify(result, "", 2));
-    } else {
-        response.writeHead(404, { "Content-Type": "text/plain" });
-        response.write(`404 ${result}`);
-    }
-}
+let reqUr = "";
 
 http.createServer((request, response) => {
-
-    console.log(request.url);
-    console.log(request.method);
-
-    let reqUrl = request.url;
-
+    reqUrl = request.url;
     let stringArr = request.url.split("/");
     stringArr.splice(0, 1);
 
@@ -73,39 +54,38 @@ http.createServer((request, response) => {
 
     switch (reqUrl) {
         case `/news/${newsId}/subscribe/${userId}`:
-            allNU.subscribeUser(newsId, userId);
-            response.write(`User with id ${userId} subscribes to news with id ${newsId}`);
-            response.end();
+            result = allNU.subscribeUser(newsId, userId);
+            sendResponse.okNotFound(result, response);
             break;
         case `/news/${newsId}/unsubscribe/${userId}`:
-            allNU.unsubscribeUser(newsId, userId);
-            response.write(`User with id ${userId} unsubscribes from news with id ${newsId}`);
-            response.end();
+            result = allNU.unsubscribeUser(newsId, userId);
+            sendResponse.okNotFound(result, response);
             break;
         case `/user/${userId}/subscriptions`:
-            response.write(JSON.stringify(allNU.getSubsriptions(userId), "", 2));
-            response.end();
+            result = allNU.getSubsriptions(userId);
+            sendResponse.sendJSONNotF(result, response);
             break;
         case `/user/${userId}/export`:
-        response.writeHead(200, { "Content-Disposition": "attachment" });
-            allNU.exportUser(userId, response).then((file)=>{
-                response.write(file, "binary");
+            let time = new Date();
+            let nameFile = `user_${userId}_${time.getHours()}-${time.getMinutes()}.json`
+            allNU.exportUser(userId, nameFile, response).then((file) => {
+                response.writeHead(200, { "Content-Disposition": `attachment; filename = ${nameFile}` });
+                response.write(file);
                 response.end();
             });
-
             break;
         case `/user/${userId}`:
             result = allNU.getUser(userId);
-            validData(result, User, response);
-            response.end();
+            sendResponse.sendJSONNotF(result, response);
             break;
         case `/news/${newsId}`:
             result = allNU.getNews(newsId);
-            validData(result, News, response);
-            response.end();
+            sendResponse.sendJSONNotF(result, response);
             break;
+        case `/`:
+            sendResponse.notFound("Not found", response);
     }
-    
+
 }).listen(3000, () => console.log("Server is working"));
 
 

@@ -19,10 +19,8 @@ class User {
     get subscriptions(){
         return this._subscriptions;
     }
-    
 
     getNews(news) {
-        console.log(`${news.title} ${news.message}  for ${this._name}`);
         let title = news.title;
         let message = news.message;
         let newsId = news.newsId;

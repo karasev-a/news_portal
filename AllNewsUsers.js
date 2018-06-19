@@ -8,7 +8,6 @@ class AllNewsUsers {
         this._allNews = [];
         this._allUsers = [];
         this._eventEmitter = eventEmitter;
-        this._counterNews = 0;
     }
 
     readFileProm(path, coding) {
@@ -75,7 +74,6 @@ class AllNewsUsers {
             user = new User(this._allUsers.length, name);
             this._allUsers.push(user);
         }
-
         return user;
     }
 
@@ -89,14 +87,12 @@ class AllNewsUsers {
                 let newsId = news.id;
                 let titleNews = news.title;
                 let subscription = { newsId, titleNews }
-                this._allUsers[idUser].subscriptions.push(subscription)
+                this._allUsers[idUser].subscriptions.push(subscription);
             } else {
-                res = `There is not news with id ${newsIdPar}`
-                console.log(res);
+                res = `Not found News with id ${newsIdPar}`
             }
         } else {
             res = `Not found User with id ${idUser}`
-            console.log(res);
         }
         return res;
     }
@@ -104,23 +100,33 @@ class AllNewsUsers {
     unsubscribeUser(newsIdPar, idUser) {
         let res = "";
         if (this._allUsers[idUser]) {
-
             res = this._allUsers[idUser];
             const news = this._allNews.find(el => { if (el.id === newsIdPar) { return true; } })
-            this._eventEmitter.unsubscribe(news.title, res.getNews)
-            const a = this._allUsers[idUser].subscriptions.find(el => {
-                if (el.newsId === news.id) {
-                    return true;
+            if (news !== undefined) {
+                if (this._eventEmitter.subscribers[news.title]) {
+                    this._eventEmitter.unsubscribe(news.title, res.getNews)
+                    const a = this._allUsers[idUser].subscriptions.find(el => {
+                        let localRes = "";
+                        if (el.newsId === news.id) {
+                            localRes = true;
+                        }else{
+                            localRes = false;
+                            res = `Not found. Use with id ${idUser} don't subscribe to news with id ${newsIdPar} `;
+                        }
+                        return localRes;
+                    })
+                    let indexSub = this._allUsers[idUser].subscriptions.indexOf(a);
+                    if (indexSub >= 0) {
+                        this._allUsers[idUser].subscriptions.splice(indexSub, 1);
+                    }
+                }else {
+                    res = `Not found. Use with id ${idUser} don't subscribe to news with id ${newsIdPar} `
                 }
-            })
-
-            let indexSub = this._allUsers[idUser].subscriptions.indexOf(a);
-            if (indexSub >= 0) {
-                this._allUsers[idUser].subscriptions.splice(indexSub, 1);
+            } else {
+                res = `Not found News with id ${newsIdPar}`
             }
         } else {
             res = `Not found User with id ${idUser}`
-            console.log(res);
         }
         return res;
     }
@@ -136,24 +142,24 @@ class AllNewsUsers {
     }
 
     getSubsriptions(idUser) {
+        let res = "";
         let user = this.getUser(idUser);
-        let subscription = []
-        return user.subscriptions;
+        if (typeof user !== "string") {
+            res = user.subscriptions;
+        } else {
+            res = user;
+        }
+        return res;
     }
 
-    exportUser(idUser, response) {
+    exportUser(idUser, nameFile, response) {
         let user = this.getUser(idUser);
         let json = JSON.stringify(user, "", 2);
-        let time = new Date();
-        let path = `user_${idUser}_${time.getHours()}_${time.getMinutes()}.json`;
-
-        //fs.writeFile(, json, 'utf8', (err) => {
-        return this.writeFileProm(path, json, "utf8").
-        then((user)=>{
-           return  this.readFileProm(path, user, "utf8");
-        });
+        return this.writeFileProm(nameFile, json, "utf8").
+            then((user) => {
+                return this.readFileProm(nameFile, user);
+            });
     }
-
 
     getNews(idNews) {
         let res = "";
@@ -164,10 +170,6 @@ class AllNewsUsers {
         }
         return res;
     }
-
-
-
-
 }
 
 module.exports = AllNewsUsers;

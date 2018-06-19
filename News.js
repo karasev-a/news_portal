@@ -17,14 +17,12 @@ class News {
     }
 
     addArticle() {
-
         let title = `article # ${this._counterArticle} of ${this._title} `;
         let message = `bla bla bla in article # ${this._counterArticle}`;
         let article = {title, message};
         this._articles.push(article);
         this._counterArticle++;
         return article;
-
     }
 }
 
