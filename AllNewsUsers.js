@@ -109,7 +109,7 @@ class AllNewsUsers {
                         let localRes = "";
                         if (el.newsId === news.id) {
                             localRes = true;
-                        }else{
+                        } else {
                             localRes = false;
                             res = `Not found. Use with id ${idUser} don't subscribe to news with id ${newsIdPar} `;
                         }
@@ -119,7 +119,7 @@ class AllNewsUsers {
                     if (indexSub >= 0) {
                         this._allUsers[idUser].subscriptions.splice(indexSub, 1);
                     }
-                }else {
+                } else {
                     res = `Not found. Use with id ${idUser} don't subscribe to news with id ${newsIdPar} `
                 }
             } else {
@@ -154,11 +154,16 @@ class AllNewsUsers {
 
     exportUser(idUser, nameFile, response) {
         let user = this.getUser(idUser);
-        let json = JSON.stringify(user, "", 2);
-        return this.writeFileProm(nameFile, json, "utf8").
-            then((user) => {
-                return this.readFileProm(nameFile, user);
-            });
+        if (typeof user !== "string") {
+            let json = JSON.stringify(user, "", 2);
+            return this.writeFileProm(nameFile, json, "utf8").
+                then((user) => {
+                    return this.readFileProm(nameFile, user);
+                });
+        } else {
+            return user;
+        }
+
     }
 
     getNews(idNews) {

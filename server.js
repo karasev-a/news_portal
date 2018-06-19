@@ -68,11 +68,17 @@ http.createServer((request, response) => {
         case `/user/${userId}/export`:
             let time = new Date();
             let nameFile = `user_${userId}_${time.getHours()}-${time.getMinutes()}.json`
-            allNU.exportUser(userId, nameFile, response).then((file) => {
-                response.writeHead(200, { "Content-Disposition": `attachment; filename = ${nameFile}` });
-                response.write(file);
-                response.end();
-            });
+            let user = allNU.exportUser(userId, nameFile, response);
+            if(typeof user !== "string"){
+                user.then((file) => {
+                    response.writeHead(200, { "Content-Disposition": `attachment; filename = ${nameFile}` });
+                    response.write(file);
+                    response.end();
+                });
+            } else {
+                sendResponse.notFound(user, response);
+            }
+            
             break;
         case `/user/${userId}`:
             result = allNU.getUser(userId);
